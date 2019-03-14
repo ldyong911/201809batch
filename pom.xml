@@ -1,0 +1,75 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>kr.or.ddit</groupId>
+  <artifactId>batch</artifactId>
+  <version>V1</version>
+  <packaging>war</packaging>
+  
+  <repositories>
+	<!-- ojdbc6 설정시 -->
+	<repository>
+		<id>codelds</id>
+		<url>https://code.lds.org/nexus/content/groups/main-repo</url>
+	</repository>
+  </repositories>
+  
+  <properties>
+  	<java.version>1.7</java.version> <!-- 밑에서 ${java.version}으로 사용됨 -->
+  	<spring.version>4.3.22.RELEASE</spring.version> <!-- 밑에서 ${spring.version}으로 사용됨 -->
+  	<mybatis.version>3.5.0</mybatis.version> <!-- 밑에서 ${mybatis.version}으로 사용됨 -->
+  	<junit.version>4.12</junit.version> <!-- 밑에서 ${junit.version}으로 사용됨 -->
+  </properties>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+  			<artifactId>maven-compiler-plugin</artifactId>
+  			<configuration>
+  				<source>${java.version}</source>
+  				<target>${java.version}</target>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
+  
+  <dependencies>
+  
+  	<!-- https://mvnrepository.com/artifact/org.springframework.batch/spring-batch-core -->
+	<dependency>
+	    <groupId>org.springframework.batch</groupId>
+	    <artifactId>spring-batch-core</artifactId>
+	    <version>3.0.10.RELEASE</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.springframework.batch/spring-batch-infrastructure -->
+	<dependency>
+	    <groupId>org.springframework.batch</groupId>
+	    <artifactId>spring-batch-infrastructure</artifactId>
+	    <version>3.0.10.RELEASE</version>
+	</dependency>
+
+	<!-- https://mvnrepository.com/artifact/org.springframework.batch/spring-batch-test -->
+	<dependency>
+	    <groupId>org.springframework.batch</groupId>
+	    <artifactId>spring-batch-test</artifactId>
+	    <version>3.0.10.RELEASE</version>
+	    <scope>test</scope>
+	</dependency>
+	
+	<!-- 로그 -->
+	<dependency>
+	    <groupId>ch.qos.logback</groupId>
+	    <artifactId>logback-classic</artifactId>
+	    <version>1.2.3</version>
+	</dependency>
+	
+	<!-- ContextLoaderListener 등록할때 필요 -->
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-web</artifactId>
+		<version>${spring.version}</version>
+	</dependency>
+  	
+  </dependencies>
+  
+</project>
