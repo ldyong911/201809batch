@@ -14,7 +14,7 @@
   	values(#{cid}, #{pid}, #{dt}, #{cnt})
   </insert>
   
-  <!-- 입력하려고하는 데이터가 -->
+  <!-- 입력하려고하는 데이터가 있으면 update, 없으면 insert-->
   <insert id="mergeDaily" parameterType="dailyVo">
   	merge into daily
 	using dual on(
