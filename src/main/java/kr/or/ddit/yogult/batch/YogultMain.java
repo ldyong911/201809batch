@@ -1,6 +1,12 @@
-package kr.or.ddit.batch.hello;
+package kr.or.ddit.yogult.batch;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -10,26 +16,25 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class HelloMain {
+public class YogultMain {
 	public static void main(String[] args) {
-		ConfigurableApplicationContext context = 
+		ConfigurableApplicationContext context =
 				new ClassPathXmlApplicationContext("classpath:kr/or/ddit/config/spring/context-batch.xml");
 		
-		//launcher lookup(DL)
-		JobLauncher jobLauncher= context.getBean("jobLauncher", JobLauncher.class);
+		//jobLauncher, job 받아옴(DL)
+		JobLauncher jobLauncher = context.getBean("jobLauncher", JobLauncher.class);
+		Job yogultJob = context.getBean("yogultJob", Job.class);
 		
-		//job lookup(DL)
-		Job helloJob = context.getBean("helloJob", Job.class);
+		Map<String, JobParameter> map = new HashMap<String, JobParameter>();
+		map.put("ym", new JobParameter(new SimpleDateFormat("yyyyMM").format(new Date())));
 		
-		//job 실행
 		try {
-			jobLauncher.run(helloJob, new JobParameters());
+			jobLauncher.run(yogultJob, new JobParameters(map));
 		} catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
 				| JobParametersInvalidException e) {
 			e.printStackTrace();
 		}
 		
-		//context 객체 close
 		context.close();
 	}
 }
