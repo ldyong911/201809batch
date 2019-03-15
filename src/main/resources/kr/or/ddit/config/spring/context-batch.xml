@@ -4,10 +4,30 @@
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:task="http://www.springframework.org/schema/task"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	
+	<!-- @Controller, @Service, @Repository, @Component를 스캔 -->
+	<!-- 
+		use-defalut-filters 값이 true이면 기본 4가지를 다 스캔하며
+		false이면 필터에 context:include-filter를 통해 어노테이션을 포함시키거나 제외시킬수 있음
+	 -->
+	<context:component-scan base-package="kr.or.ddit" use-default-filters="false">
+		<context:include-filter type="annotation" 
+						  		expression="org.springframework.stereotype.Service"/>
+		<context:include-filter type="annotation"
+								expression="org.springframework.stereotype.Repository"/>
+	</context:component-scan>
+	
+	<!-- @Service, @Repository 어노테이션 적용된 클래스를 스캔 -->
+	<!-- spring bean에 선언된 @Autowired, @Resource, @Inject -->
+	<context:annotation-config/>
 	
 	<!-- dataSource : db.properties -->
 	<context:property-placeholder location="classpath:kr/or/ddit/config/db/db.properties"/>
@@ -28,41 +48,21 @@
 		<property name="configLocation" value="classpath:kr/or/ddit/config/db/mybatis-config.xml"/>
 	</bean>
 	
-	<!-- reader -->
-	<bean id="yogultItemReader" class="org.mybatis.spring.batch.MyBatisCursorItemReader">
-		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
-		<property name="queryId" value="yogult.getCycleList"/>
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"/>
 	</bean>
 	
-	<!-- processor -->
-	<bean id="yogultItemProcessor" class="kr.or.ddit.yogult.batch.YogultItemProcessor" scope="step"/>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*"/>
+		</tx:attributes>
+	</tx:advice>
 	
-	<!-- writer -->
-	<bean id="yogultItemWriter" class="kr.or.ddit.yogult.batch.CustomMyBatisBatchItemWriter">
-		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
-		<property name="statementId" value="yogult.mergeDaily"/>
-	</bean>
-	
-	<batch:job-repository id="jobRepository" data-source="dataSource" transaction-manager="transactionManager"/>
-	
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-		<property name="jobRepository" ref="jobRepository"/>
-	</bean>
-	
-	<!-- batch job 등록 -->
-	<!-- restartable, allow-start-if-complete 옵션이 true여야 1번 실행후 계속 실행 -->
-	<batch:job id="yogultJob" restartable="true">
-		<batch:step id="step1" allow-start-if-complete="true">
-			<batch:tasklet>
-				<!-- commit-interval은 chunk 사이즈 -->
-				<batch:chunk reader="yogultItemReader" processor="yogultItemProcessor" writer="yogultItemWriter" commit-interval="1">
-				</batch:chunk>
-			</batch:tasklet>
-		</batch:step>
-	</batch:job>
+	<aop:config>
+		<aop:advisor advice-ref="txAdvice" pointcut="execution(* kr.or.ddit..*.service.*(..))"/>
+	</aop:config>
 	
 	<!-- 스케줄러 등록 -->
-	<bean id="yogultTsk" class="kr.or.ddit.yogult.batch.YogultTask"/>
 	<task:scheduler id="scheduler"/>
 	<task:executor id="executor"/>
 	<task:annotation-driven scheduler="scheduler" executor="executor"/>

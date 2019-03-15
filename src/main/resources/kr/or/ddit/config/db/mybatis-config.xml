@@ -7,10 +7,12 @@
   <typeAliases>
   	<typeAlias alias="CycleVo" type="kr.or.ddit.yogult.model.CycleVo"/>
   	<typeAlias alias="DailyVo" type="kr.or.ddit.yogult.model.DailyVo"/>
+  	<typeAlias alias="BatchVo" type="kr.or.ddit.batch.model.BatchVo"/>
   </typeAliases>
   
   <!-- mapper 설정 -->
   <mappers>
     <mapper resource="kr/or/ddit/config/db/mapper/yogult.xml"/>
+    <mapper resource="kr/or/ddit/config/db/mapper/batch.xml"/>
   </mappers>
 </configuration>
